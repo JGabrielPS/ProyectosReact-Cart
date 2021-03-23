@@ -23,13 +23,24 @@ const AppProvider = ({ children }) => {
     dispatch({ type: "REMOVE", payload: id });
   };
 
-  const increase = (id) => {
-    dispatch({ type: "INCREASE", payload: id });
+  const toggleAmount = (id, action) => {
+    dispatch({ type: "TOGGLE_AMOUNT", payload: { id, action } });
   };
 
-  const decrease = (id) => {
-    dispatch({ type: "DECREASE", payload: id });
+  const fetchData = async () => {
+    dispatch({ type: "LOADING" });
+    const resp = await fetch(url);
+    const cart = await resp.json();
+    dispatch({ type: "DISPLAY_ITEMS", payload: cart });
   };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    dispatch({ type: "GET_TOTALS" });
+  }, [state.cart]);
 
   return (
     <AppContext.Provider
@@ -37,8 +48,7 @@ const AppProvider = ({ children }) => {
         ...state,
         clearCart,
         remove,
-        increase,
-        decrease,
+        toggleAmount,
       }}
     >
       {children}
